@@ -15,10 +15,13 @@ dotenv.config();
 
 (async () => {
     const app = express();
-
+    const publicIp = process.env.PUBLIC_IP || (await (await fetch('https://api.ipify.org?format=json')).json()).ip
     const node = await createLibp2p({
         addresses: {
-            listen: ["/ip6/::/tcp/0", "/ip4/0.0.0.0/tcp/0/ws"],
+            announce: [
+                `/ip4/${publicIp}/tcp/${process.env.REGULAR_PORT}`,
+                `/ip4/${publicIp}/tcp/${process.env.WS_PORT}/ws`  
+            ]
         },
         transports: [webSockets(), tcp()],
         connectionEncrypters: [noise()],
