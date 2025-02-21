@@ -51,7 +51,7 @@ dotenv.config();
     node.getMultiaddrs().forEach((addr) => {
         console.log(addr.toString());
     });
-    app.get("/api/listen", async (req, res) => {
+    app.get("/api/listeners", async (req, res) => {
         res.json(node.getMultiaddrs().map((addr) => {
             return addr.toString()
         }));
