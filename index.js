@@ -15,9 +15,19 @@ dotenv.config();
 
 (async () => {
     const app = express();
+    app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+        next();
+    });
     const publicIp = process.env.PUBLIC_IP || (await (await fetch('https://api.ipify.org?format=json')).json()).ip
     const node = await createLibp2p({
         addresses: {
+            listen: [
+                `/ip4/0.0.0.0/tcp/${process.env.REGULAR_PORT}`,
+                `/ip4/0.0.0.0/tcp/${process.env.WS_PORT}/ws`  
+            ],
             announce: [
                 `/ip4/${publicIp}/tcp/${process.env.REGULAR_PORT}`,
                 `/ip4/${publicIp}/tcp/${process.env.WS_PORT}/ws`  
