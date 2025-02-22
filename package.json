@@ -13,6 +13,7 @@
     "@libp2p/identify": "^3.0.15",
     "@libp2p/tcp": "^10.0.15",
     "@libp2p/websockets": "^9.1.2",
+    "@multiformats/multiaddr": "^12.4.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "libp2p": "^2.5.0"

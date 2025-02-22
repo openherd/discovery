@@ -9,6 +9,7 @@ import { circuitRelayServer } from "@libp2p/circuit-relay-v2";
 import { autoNAT } from "@libp2p/autonat";
 import dotenv from "dotenv";
 import express from "express";
+import { multiaddr } from '@multiformats/multiaddr';
 
 dotenv.config();
 
@@ -72,14 +73,21 @@ dotenv.config();
 
     app.get("/api/discovery", async (req, res) => {
         const connections = node.getConnections();
-        const peerAddresses = connections.map(conn => {
-            const peerId = conn.remotePeer.toString();
+        const wsConnections = [];
+        const tcpConnections = [];
+    
+        connections.forEach(conn => {
             const multiaddr = conn.remoteAddr.toString();
-            return `${multiaddr}/p2p/${peerId}`;
+            if (multiaddr.includes('/ws')) {
+                wsConnections.push(multiaddr);
+            } else {
+                tcpConnections.push(multiaddr);
+            }
         });
+    
+        const peerAddresses = [...wsConnections, ...tcpConnections];
         res.json(peerAddresses);
     });
-
     app.listen(process.env.PORT || 8086, () => {
         console.log(`Discovery listening on port ${process.env.PORT || 8086}`)
     })
