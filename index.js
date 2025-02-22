@@ -30,9 +30,9 @@ dotenv.config();
                 `/ip4/0.0.0.0/tcp/${process.env.WS_PORT}/ws`
             ],
             announce: [
+                `/dns4/${process.env.DNS_HOSTNAME}/tcp/${process.env.WS_PORT}/wss`,
                 `/ip4/${publicIp}/tcp/${process.env.REGULAR_PORT}`,
-                `/ip4/${publicIp}/tcp/${process.env.WS_PORT}/ws`,
-                `/dns4/${process.env.DNS_HOSTNAME}/tcp/${process.env.WS_PORT}/wss`
+                `/ip4/${publicIp}/tcp/${process.env.WS_PORT}/ws`
             ]
         },
         transports: [webSockets(), tcp()],
