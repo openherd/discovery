@@ -27,11 +27,12 @@ dotenv.config();
         addresses: {
             listen: [
                 `/ip4/0.0.0.0/tcp/${process.env.REGULAR_PORT}`,
-                `/ip4/0.0.0.0/tcp/${process.env.WS_PORT}/ws`  
+                `/ip4/0.0.0.0/tcp/${process.env.WS_PORT}/ws`
             ],
             announce: [
                 `/ip4/${publicIp}/tcp/${process.env.REGULAR_PORT}`,
-                `/ip4/${publicIp}/tcp/${process.env.WS_PORT}/ws`  
+                `/ip4/${publicIp}/tcp/${process.env.WS_PORT}/ws`,
+                `/dns4/${process.env.DNS_HOSTNAME}/dns4/${process.env.WS_PORT}/wss`
             ]
         },
         transports: [webSockets(), tcp()],
@@ -73,19 +74,22 @@ dotenv.config();
 
     app.get("/api/discovery", async (req, res) => {
         const connections = node.getConnections();
+        const wsdnsConnections = [];
         const wsConnections = [];
         const tcpConnections = [];
-    
+
         connections.forEach(conn => {
             const multiaddr = conn.remoteAddr.toString();
-            if (multiaddr.includes('/ws')) {
+            if (multiaddr.includes('/wss') && (multiaddr.includes('/dns4') || multiaddr.includes('/dns6'))) {
+                wsdnsConnections.push(multiaddr);
+            } else if (multiaddr.includes('/ws')) {
                 wsConnections.push(multiaddr);
             } else {
                 tcpConnections.push(multiaddr);
             }
         });
-    
-        const peerAddresses = [...wsConnections, ...tcpConnections];
+
+        const peerAddresses = [...wsdnsConnections, ...wsConnections, ...tcpConnections];
         res.json(peerAddresses);
     });
     app.listen(process.env.PORT || 8086, () => {
